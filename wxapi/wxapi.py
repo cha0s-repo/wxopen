@@ -3,6 +3,7 @@ import hashlib
 import xml.etree.ElementTree as xmlp
 from time import time
 from dicttoxml import dicttoxml
+from stock.stockdata import StockData
 
 class WxApi:
     def __init__(self, log_path, log_level):
@@ -36,9 +37,15 @@ class WxApi:
         logging.debug('post msg: ' + xml_msg)
         in_msg = self.parse_xml(xml_msg)
 
-        if in_msg['Content'] is not None:
+        req_msg = in_msg['Content']
+        if req_msg is not None:
             # process cmd
-            return self.generate_msg(in_msg, 'test')
+            try:
+                che = int(req_msg)
+                ret_msg = StockData(date=req_msg).S1()
+            except:
+                ret_msg = 'error'
+            return self.generate_msg(in_msg, ret_msg)
         else:
             # return default error msg
             logging.error('not get vaild msg')
